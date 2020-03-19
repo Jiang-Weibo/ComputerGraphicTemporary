@@ -1,0 +1,94 @@
+#include<stdio.h>
+#include<gl/glut.h>
+#include<GLU.H>
+#include<GL.H>
+//GLfloat x = 1;
+//GLfloat y = 1;
+GLdouble coordinateX[300] = {-1};
+GLdouble coordinateY[300] = {-1};
+int cursor = 0;
+//int dir;
+//int rot;
+void step(int dir) {
+    switch (dir & 3) {
+    case 0: 
+    {
+        coordinateY[cursor + 1] = coordinateY[cursor];
+        coordinateX[cursor + 1] = coordinateX[cursor] + 0.1;
+        cursor++;
+        break;
+    }
+    case 1: 
+    {
+        coordinateX[cursor + 1] = coordinateX[cursor];
+        coordinateY[cursor + 1] = coordinateY[cursor] + 0.1;
+        cursor++;
+        break;
+    }
+    case 2: 
+    {
+        coordinateY[cursor + 1] = coordinateY[cursor];
+        coordinateX[cursor + 1] = coordinateX[cursor] - 0.1;
+        cursor++;
+        break;
+    }
+    case 3:
+    {
+        coordinateX[cursor + 1] = coordinateX[cursor];
+        coordinateY[cursor + 1] = coordinateY[cursor] - 0.1;
+        cursor++;
+        break;
+    }
+    }
+}
+void Hilbert(int dir, int rot, int order) {
+    if (order == 0)
+    {
+        return;
+    }
+    dir = dir + rot;
+    Hilbert(dir, -rot, order - 1);
+    step(dir);
+    dir = dir - rot;
+    Hilbert(dir, rot, order - 1);
+    step(dir);
+    Hilbert(dir, rot, order - 1);
+    dir = dir - rot;
+    step(dir);
+    Hilbert(dir, -rot, order - 1);
+}
+/*void OnTimer(int id)
+{
+    printf("x is %f, y is %f.\n", x, y);
+    glutPostRedisplay();
+    if(x>-1&&y>-1)
+    {
+        glutTimerFunc(33, OnTimer, 1);
+    }
+
+}*/
+void display()
+{
+    //glClear(GL_COLOR_BUFFER_BIT);
+    glBegin(GL_LINE_STRIP);
+    //glVertex2f(x+step, y+step);
+    for (int i = 0;i <= cursor;i++)
+    {
+        printf("x is %f, y is %f, cursor is %d, i is %d\n", coordinateX[i], coordinateY[i], cursor, i);
+        glVertex2f(coordinateX[i], coordinateY[i]);
+    }
+    glEnd();
+    glFlush();
+}
+int main(int argc, char** argv)
+{
+    int Order = 2;
+    glutInit(&argc, argv);
+    glutInitWindowSize(500, 500);
+    glutCreateWindow("HilbertCurve");
+    step(0);
+    Hilbert(0, 1, Order);//order=4
+    glutDisplayFunc(display);
+    //glutTimerFunc(330, OnTimer, 1);
+    glutMainLoop();
+}
